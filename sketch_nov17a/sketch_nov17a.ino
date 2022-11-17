@@ -22,11 +22,13 @@ int e_normal = 0;
 int e_funny = 0;
 int e_sadly = 0;
 int m_normal = 0;
-LedControl lc=LedControl(DIN,CLK,CS,4);
+LedControl lc=LedControl(DIN,CLK,CS,6);
 
 //defining timer value
 unsigned long prev = 0;
-long turn_0 = 1000;
+unsigned long m_prev = 0;
+long turn_0 = 3000;
+long turn_m = 4000;
 long anim_speed = 100;
 long exp_speed = 3000;
 
@@ -106,12 +108,14 @@ void loop(){
     }
   }
   else{
+    /*
     if (digitalRead(B0) == LOW){
       state = 2;
     }
     if (digitalRead(B1) == LOW){
       state = 3;
     }
+    */
   }
 
   //normal face
@@ -119,32 +123,46 @@ void loop(){
     if (e_normal == 0){
       draw(eye1, eye[0]);
       draw(eye2, eye[0]);
-      draw(mo1, mouth1[0]);
-      draw(mo2, mouth2[0]);
       draw(ch1, cheek[1]);
       draw(ch2, cheek[1]);
-      if (now - prev > turn_0){prev = now;  e_normal = 1;}
+      if (now - prev > turn_0){prev = now; e_normal = 1;}
     }
     if (e_normal == 1){
       draw(eye1, eye[1]);
       draw(eye2, eye[1]);
-      draw(mo1, mouth1[1]);
-      draw(mo2, mouth2[1]);
-      if (now - prev > anim_speed){prev = now;  e_normal = 2;}
+      if (now - prev > anim_speed){prev = now; e_normal = 2;}
     }
     if (e_normal == 2){
       draw(eye1, eye[2]);
       draw(eye2, eye[2]);
-      draw(mo1, mouth1[2]);
-      draw(mo2, mouth2[2]);
-      if (now - prev > 150){prev = now;  e_normal = 3;}
+      if (now - prev > 150){prev = now; e_normal = 3;}
     }
     if (e_normal == 3){
       draw(eye1, eye[1]);
       draw(eye2, eye[1]);
+      if (now - prev > anim_speed){turn_0 = random(500,10000); prev = now; e_normal = 0;}
+    }
+
+    //okuchi pakupaku
+    if (m_normal == 0){
+      draw(mo1, mouth1[0]);
+      draw(mo2, mouth2[0]);
+      if (now - m_prev > turn_m){m_prev = now; m_normal = 1;}
+    }
+    if (m_normal == 1){
       draw(mo1, mouth1[1]);
       draw(mo2, mouth2[1]);
-      if (now - prev > anim_speed){turn_0 = random(500,10000); prev = now; e_normal = 0;}
+      if (now - m_prev > anim_speed){turn_m = random(1000,8000); m_prev = now; m_normal = 2;}
+    }
+    if (m_normal == 2){
+      draw(mo1, mouth1[2]);
+      draw(mo2, mouth2[2]);
+      if (now - m_prev > turn_m){m_prev = now; m_normal = 3;}
+    }
+    if (m_normal == 3){
+      draw(mo1, mouth1[1]);
+      draw(mo2, mouth2[1]);
+      if (now - m_prev > anim_speed){turn_m = random(7000,20000); m_prev = now; m_normal = 0;}
     }
   }
 
@@ -179,6 +197,8 @@ void loop(){
       draw(eye2, eye[6]);
       draw(mo1, mouth1[3]);
       draw(mo2, mouth2[3]);
+      draw(ch1, cheek[2]);
+      draw(ch2, cheek[2]);
       if (now - prev > exp_speed){prev = now; e_funny = 4;}
     }
     if (e_funny == 4){
@@ -191,9 +211,11 @@ void loop(){
     if (e_funny == 5){
       draw(eye1, eye[1]);
       draw(eye2, eye[1]);
-      draw(mo1, mouth1[1]);
-      draw(mo2, mouth2[1]);
-      if (now - prev > anim_speed){prev = now;  e_funny = 0; state = 1;}
+      if (m_normal == 0){
+        draw(mo1, mouth1[1]);
+        draw(mo2, mouth2[1]);
+      }
+      if (now - prev > anim_speed){prev = now; m_prev = now; e_funny = 0; state = 1;}
     }
   }
 
@@ -213,8 +235,8 @@ void loop(){
       draw(eye2, eye[2]);
       draw(mo1, mouth1[2]);
       draw(mo2, mouth2[2]);
-      draw(ch1, cheek[0]);
-      draw(ch2, cheek[0]);
+      draw(ch1, cheek[1]);
+      draw(ch2, cheek[1]);
       if (now - prev > anim_speed){prev = now;  e_sadly = 2;}
     }
     if (e_sadly == 2){
@@ -243,11 +265,13 @@ void loop(){
     if (e_sadly == 5){
       draw(eye1, eye[1]);
       draw(eye2, eye[1]);
-      draw(mo1, mouth1[1]);
-      draw(mo2, mouth2[1]);
+      if (m_normal == 0){
+        draw(mo1, mouth1[1]);
+        draw(mo2, mouth2[1]);
+      }
       draw(ch1, cheek[0]);
       draw(ch2, cheek[0]);
-      if (now - prev > anim_speed){prev = now;  e_sadly = 0; state = 1;}
+      if (now - prev > anim_speed){prev = now; m_prev = now; e_sadly = 0; state = 1;}
     }
   }
 
