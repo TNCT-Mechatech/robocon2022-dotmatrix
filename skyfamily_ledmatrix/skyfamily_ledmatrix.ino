@@ -1,6 +1,18 @@
 //SKY x FAMILY face LED matrix
 #include <LedControl.h>
 
+//  SB
+#include <SerialBridge.hpp>
+#include <InoHardwareSerial.hpp>
+#include "./Emotion.hpp"
+
+#define EMOTION_TX_ID 20
+
+SerialDev *dev = new InoHardwareSerial(&Serial1);
+SerialBridge serial(dev);
+
+Emotion emotion_msg;
+
 //Face expression changeing variable for communication
 #define B0 10
 #define B1 9
@@ -71,6 +83,11 @@ byte cheek[5][8]={
 
 //initialize
 void setup(){
+  //  setup SerialBridge
+  Serial1.begin(115200);
+  serial.add_frame(EMOTION_TX_ID, &emotion_msg);
+
+  //  setup led control
   int ini = 0;
     for( ini=0;ini<8;ini++ ){
       lc.shutdown(ini,false);
@@ -82,7 +99,13 @@ void setup(){
 }
 
 void loop(){
-
+  if(serial.update() == 0)
+  {
+    if(emotion_msg.was_updated())
+    {
+      state = (int) emotion_msg.data.face;
+    }
+  }
   //system time
   unsigned long now = millis();
 
